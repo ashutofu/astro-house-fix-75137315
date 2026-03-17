@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import PlaceSearch from '@/components/PlaceSearch';
 
 export interface BirthFormData {
   year: number;
@@ -28,12 +29,18 @@ const BirthDetailsForm: React.FC<Props> = ({ onSubmit }) => {
   const [form, setForm] = useState<BirthFormData>({
     year: 1990, month: 1, day: 15,
     hour: 6, minute: 0,
-    latitude: 28.6139, longitude: 77.2090, // Delhi
-    timezone: 5.5, // IST
+    latitude: 28.6139, longitude: 77.2090,
+    timezone: 5.5,
   });
+  const [placeName, setPlaceName] = useState('New Delhi, India');
 
   const update = (field: keyof BirthFormData, value: string | number) => {
     setForm(prev => ({ ...prev, [field]: typeof value === 'string' ? parseFloat(value) || 0 : value }));
+  };
+
+  const handlePlaceSelect = (lat: number, lng: number, tz: number, name: string) => {
+    setForm(prev => ({ ...prev, latitude: lat, longitude: lng, timezone: tz }));
+    setPlaceName(name);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -46,7 +53,7 @@ const BirthDetailsForm: React.FC<Props> = ({ onSubmit }) => {
       <div className="grid grid-cols-3 gap-3">
         <div>
           <Label className="text-xs text-muted-foreground">Year</Label>
-          <Input type="number" value={form.year} onChange={e => update('year', e.target.value)} 
+          <Input type="number" value={form.year} onChange={e => update('year', e.target.value)}
             className="bg-cosmic-surface border-border" />
         </div>
         <div>
@@ -80,6 +87,12 @@ const BirthDetailsForm: React.FC<Props> = ({ onSubmit }) => {
           <Input type="number" min={0} max={59} value={form.minute} onChange={e => update('minute', e.target.value)}
             className="bg-cosmic-surface border-border" />
         </div>
+      </div>
+
+      {/* Place search */}
+      <div>
+        <Label className="text-xs text-muted-foreground">Birth Place</Label>
+        <PlaceSearch currentPlace={placeName} onSelect={handlePlaceSelect} />
       </div>
 
       <div className="grid grid-cols-3 gap-3">
